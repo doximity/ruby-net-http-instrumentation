@@ -4,14 +4,14 @@ require "net/http/instrumentation/version"
 module Net
   module Http
     module Instrumentation
-      UUID_REGEX = /[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}/.freeze
+      UUID_REGEX = /[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}/
 
       class << self
         attr_accessor :ignore_request, :tracer, :status_codes
 
         def instrument(tracer: OpenTracing.global_tracer,
-                       ignore_request: nil,
-                       status_code_errors: [::Net::HTTPServerError])
+          ignore_request: nil,
+          status_code_errors: [::Net::HTTPServerError])
           @ignore_request = ignore_request
           @tracer = tracer
           @status_codes = status_code_errors
@@ -40,7 +40,7 @@ module Net
               res = ""
 
               if ::Net::Http::Instrumentation.ignore_request.respond_to?(:call) &&
-                 ::Net::Http::Instrumentation.ignore_request.call(@address, req)
+                  ::Net::Http::Instrumentation.ignore_request.call(@address, req)
 
                 res = request_original(req, body, &block)
               else
@@ -65,12 +65,12 @@ module Net
                     # set response code and error if applicable
                     scope.span.set_tag("http.status_code", res.code)
                     scope.span.set_tag("error", true) if ::Net::Http::Instrumentation.status_codes.any? { |e| res.is_a? e } || (res.code.to_i >= 500 && res.code.to_i < 600)
-                  rescue StandardError => e
+                  rescue => e
                     scope.span.set_tag("error", true)
                     scope.span.log_kv(
                       event: "error",
-                      'error.kind': e.class.to_s,
-                      'error.object': e,
+                      "error.kind": e.class.to_s,
+                      "error.object": e,
                       message: e.respond_to?(:message) ? e.message : e.to_s,
                       stack: e.respond_to?(:backtrace) ? e.backtrace.join("\n") : e.to_s
                     )

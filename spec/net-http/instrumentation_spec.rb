@@ -50,9 +50,9 @@ RSpec.describe Net::Http::Instrumentation do
       end
 
       it "tags errors for default Net::HTTPServerError response class" do
-        stub_request(:any, "www.example.com").
-          to_return(body: "abc", status: 500,
-                    headers: { "Content-Length" => 3 })
+        stub_request(:any, "www.example.com")
+          .to_return(body: "abc", status: 500,
+            headers: {"Content-Length" => 3})
         uri = URI("http://www.example.com/")
 
         Net::HTTP.start(uri.host, uri.port) do |http|
@@ -68,9 +68,9 @@ RSpec.describe Net::Http::Instrumentation do
       end
 
       it "does not tag client errors by default" do
-        stub_request(:any, "www.example.com").
-          to_return(body: "abc", status: 400,
-                    headers: { "Content-Length" => 3 })
+        stub_request(:any, "www.example.com")
+          .to_return(body: "abc", status: 400,
+            headers: {"Content-Length" => 3})
         uri = URI("http://www.example.com/")
 
         Net::HTTP.start(uri.host, uri.port) do |http|
@@ -85,9 +85,9 @@ RSpec.describe Net::Http::Instrumentation do
       end
 
       it "provides a operation name based on request info" do
-        stub_request(:any, "www.example.com/api/v1/article/97863119-0fb4-4303-a0ca-0337406e8645?callback=0").
-          to_return(body: "abc", status: 400,
-                    headers: { "Content-Length" => 3 })
+        stub_request(:any, "www.example.com/api/v1/article/97863119-0fb4-4303-a0ca-0337406e8645?callback=0")
+          .to_return(body: "abc", status: 400,
+            headers: {"Content-Length" => 3})
         uri = URI("http://www.example.com/api/v1/article/97863119-0fb4-4303-a0ca-0337406e8645?callback=0")
 
         allow(OpenTracing.global_tracer).to receive(:start_active_span).with("HTTP PUT www.example.com", anything)
@@ -114,9 +114,9 @@ RSpec.describe Net::Http::Instrumentation do
       end
 
       it "tags success as error" do
-        stub_request(:any, "www.example.com").
-          to_return(body: "abc", status: 200,
-                    headers: { "Content-Length" => 3 })
+        stub_request(:any, "www.example.com")
+          .to_return(body: "abc", status: 200,
+            headers: {"Content-Length" => 3})
         uri = URI("http://www.example.com/")
 
         Net::HTTP.start(uri.host, uri.port) do |http|
@@ -132,9 +132,9 @@ RSpec.describe Net::Http::Instrumentation do
       end
 
       it "tags client errors as error" do
-        stub_request(:any, "www.example.com").
-          to_return(body: "abc", status: 400,
-                    headers: { "Content-Length" => 3 })
+        stub_request(:any, "www.example.com")
+          .to_return(body: "abc", status: 400,
+            headers: {"Content-Length" => 3})
         uri = URI("http://www.example.com/")
 
         Net::HTTP.start(uri.host, uri.port) do |http|
