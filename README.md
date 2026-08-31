@@ -55,18 +55,57 @@ To remove instrumentation:
 
 ```ruby
 Net::Http::Instrumentation.remove
+```
 
-The spans will be given a name consisting of the HTTP method and request path.
+Spans are named `HTTP <METHOD> <host>` (e.g. `HTTP GET www.example.com`).
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
+
+## Releasing
+
+CI only validates builds; publishing the gem is a manual step. This gem is
+published to Doximity's internal Nexus gem repository
+(`https://artifacts.dox.support/repository/gems`), **not** to public
+RubyGems.org. The gemspec's `allowed_push_host` enforces this — `rake release`
+refuses to push anywhere but Nexus.
+
+1. Bump the version in `lib/net/http/instrumentation/version.rb`.
+2. Add a `CHANGELOG.md` entry for the new version.
+3. Open a PR with those changes and merge it to `master`.
+4. Tag the release and push the tag. The `v*` tag triggers the `final-release`
+   CircleCI workflow, which runs the full build (specs, standardrb, docs)
+   against the tag:
+
+   ```
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+
+5. Wait for the tag build on CircleCI to pass.
+6. Publish the gem:
+
+   ```
+   bundle exec rake release
+   ```
+
+   This builds `pkg/nethttp-opentracing-X.Y.Z.gem`, reuses the existing `vX.Y.Z`
+   tag, and pushes the `.gem` file to Nexus.
+
+Pushing requires Nexus credentials for the host in `~/.gem/credentials` (an
+`:artifacts.dox.support` entry with your API token). `gem push` picks the
+entry up automatically; if you prefer, the push can also be done manually:
+
+```
+gem push --host https://artifacts.dox.support/repository/gems pkg/nethttp-opentracing-X.Y.Z.gem
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/opentracing-contrib/net-http-instrumentation.
+Bug reports and pull requests are welcome on GitHub at https://github.com/doximity/ruby-net-http-instrumentation.
 
 ## License
 
