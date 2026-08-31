@@ -34,7 +34,19 @@ jobs:
   build:
     executor: ruby
     steps:
-      - checkout
+      # This project's CircleCI checkout key no longer authenticates with
+      # GitHub (every built-in `checkout` step fails with
+      # "git@github.com: Permission denied (publickey)"), so clone the public
+      # repo over HTTPS instead. CIRCLE_SHA1 is set for branch, PR, and tag
+      # builds alike, which keeps the final-release (v* tag) workflow working.
+      # If the checkout key is ever repaired in CircleCI project settings,
+      # this step can go back to the plain `checkout` step.
+      - run:
+          name: Checkout over HTTPS
+          command: |
+            git clone "https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" .
+            git checkout --quiet "${CIRCLE_SHA1}"
+            git log -1 --oneline
       - run:
           name: Install Bundler specific version
           command: |
